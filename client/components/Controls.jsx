@@ -2,9 +2,9 @@ import React from 'react';
 const Controls = (props) =>{
     return(
         <div className="controls">
-             <button> Run</button>
+             <button onClick={props.runGame}> Run</button>
              <button> Pause</button>
-             <button> Clear</button>
+             <button onClick={props.clearBoard}> Clear</button>
              <div> Generations: <span> {props.generations} </span></div>
         </div>
     );

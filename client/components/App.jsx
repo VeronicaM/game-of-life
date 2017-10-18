@@ -11,8 +11,12 @@ import Controls from './Controls.jsx';
         this.m = 50;
         this.cellSize = 12;
         this.state = {
-                    cells :GameService.generateCells()
-                };
+                    cells :GameService.generateRandomCells(),
+                    generations : GameService.getGenerations()
+        };
+    }
+    componentDidMount(){
+       
     }
    generateCells(){
         var arr = [];
@@ -25,17 +29,26 @@ import Controls from './Controls.jsx';
         }  
         return arr;
   }
+  runGame(){
+      const newBoard = GameService.updateGame(this.state.cells);
+      this.setState({cells:newBoard, generations:GameService.getGenerations()});
+  }
   handleClickCell(cellIndex){
         let newCells = this.state.cells;
         let toggle = !newCells[cellIndex].active;
-        newCells[cellIndex]= new Object({active:toggle, index:cellIndex});
+        let value = newCells[cellIndex].active ? 0 : 1;
+        newCells[cellIndex]= new Object({active:toggle, index:cellIndex, value:value});
         this.setState({cells:newCells});
+  }
+  clearBoard(){
+      let newCells = GameService.generateCells();
+      this.setState({cells:newCells, generations:GameService.getGenerations() });
   }
     render(){
         const generatedCells = this.generateCells();
         return (
             <div>
-                <Controls />
+                <Controls generations={this.state.generations} runGame={this.runGame.bind(this)} clearBoard={this.clearBoard.bind(this)}/>
                 <div className ="boardBack">
                     <Board cells ={generatedCells} width={(this.n*this.cellSize)} />
                 </div>
