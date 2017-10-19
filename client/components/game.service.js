@@ -25,42 +25,82 @@ const GameService = (() => {
     const updateGame = function(currentBoard) {
         let board = [];
         let len = n * m;
+        let right = 0;
+        let left = 0;
+        let aboveLine = 0;
+        let belowLine = 0;
+        let count = 0;
+        let wrapLeft = false;
+        let wrapRight = false;
         for (let i = 0; i < currentBoard.length; i++) {
-            //first liine , last line , first column, last column
-            let count = 0;
-            if ((i >= 0 && i <= (n - 1)) ||
-                (i >= (len - n - 1) && i <= (len - 1)) ||
-                (i % (i / n) === 0 ||
-                    i % (i / n) === (n - 1))
-            ) {
-                board[i] = currentBoard[i];
+            if (i % n === 0) {
+                left = i + n - 1;
+                right = i + 1;
+                wrapLeft = false;
+                wrapRight = true;
+            } else if (i % n === (n - 1)) {
+                right = i - n + 1;
+                left = i - 1;
+                wrapRight = false;
+                wrapLeft = true;
+            } else {
+                right = i + 1;
+                left = i - 1;
+                wrapLeft = false;
+                wrapRight = false;
+            }
+            count = 0;
+            //first liine 
+            if ((i >= 0 && i <= (n - 1))) {
+                aboveLine = len - n + i;
+                belowLine = i + n;
+            }
+            //last line 
+            else if (i >= (len - n) && i <= (len - 1)) {
+                aboveLine = i - n;
+                belowLine = i % n;
             }
             // above line neighbors, adjanced neighbors, below line neighbors 
             else {
-                let aboveLine = i - n;
-                let belowLine = i + n;
-                //  console.log("above", aboveLine, "below", belowLine, "a-1", aboveLine - 1, "a+1", aboveLine + 1, "b-1", belowLine - 1,"b+1", belowLine + 1, "i-1",i - 1, "i + 1", i + 1);
-                count = currentBoard[aboveLine].value + currentBoard[aboveLine - 1].value + currentBoard[aboveLine + 1].value +
-                    currentBoard[belowLine].value + currentBoard[belowLine - 1].value + currentBoard[belowLine + 1].value +
-                    currentBoard[i - 1].value + currentBoard[i + 1].value;
-
-                if (currentBoard[i].value === 0 && count === 3 ||
-                    (currentBoard[i].value === 1 && (count === 2 || count === 3))) {
-                    board[i] = currentBoard[i];
-                    board[i].active = true;
-                    board[i].value = 1;
-                } else {
-                    board[i] = currentBoard[i];
-                    board[i].active = false;
-                    board[i].value = 0;
-                }
-
+                aboveLine = i - n;
+                belowLine = i + n;
             }
+            count = getCount(aboveLine, belowLine, i, right, left, wrapRight, wrapLeft, currentBoard);
+            board[i] = assignValue(currentBoard[i], count);
         }
         generations++;
         return board;
     }
+    const getCount = function(aboveLine, belowLine, i, right, left, wrapRight, wrapLeft, currentBoard) {
+        let belowLeft = belowLine - 1;
+        let belowRight = belowLine + 1;
+        let aboveLeft = aboveLine - 1;
+        let aboveRight = aboveLine + 1;
 
+        if (wrapRight) {
+            belowLeft = belowLine + n - 1;
+            aboveLeft = aboveLine + n - 1;
+        } else if (wrapLeft) {
+            belowRight = belowLine - n + 1;
+            aboveRight = aboveLine - n + 1;
+        }
+        let count = currentBoard[aboveLine].value + currentBoard[aboveLeft].value + currentBoard[aboveRight].value +
+            currentBoard[belowLine].value + currentBoard[belowLeft].value + currentBoard[belowRight].value +
+            currentBoard[left].value + currentBoard[right].value;
+        return count;
+    }
+    const assignValue = function(currentCell, count) {
+        let newCell = Object.assign({}, currentCell);
+        if (currentCell.value === 0 && count === 3 ||
+            (currentCell.value === 1 && (count === 2 || count === 3))) {
+            newCell.active = true;
+            newCell.value = 1;
+        } else {
+            newCell.active = false;
+            newCell.value = 0;
+        }
+        return newCell;
+    }
     const getGenerations = function() {
         return generations;
     }
