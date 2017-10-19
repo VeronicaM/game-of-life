@@ -4,6 +4,8 @@ import Board from './Board.jsx';
 import Cell from './Cell.jsx';
 import GameService from './game.service.js';
 import Controls from './Controls.jsx';
+import update from 'immutability-helper';
+
  class App extends React.Component{
     constructor(props){
         super(props);
@@ -33,11 +35,9 @@ import Controls from './Controls.jsx';
       const newBoard = GameService.updateGame(this.state.cells);
       this.setState({cells:newBoard, generations:GameService.getGenerations()});
   }
-  handleClickCell(cellIndex){
-        let newCells = this.state.cells;
-        let toggle = !newCells[cellIndex].active;
-        let value = newCells[cellIndex].active ? 0 : 1;
-        newCells[cellIndex]= new Object({active:toggle, index:cellIndex, value:value});
+  handleClickCell(cell){
+       let newCells = update(this.state.cells,
+                {$splice: [[cell.index, 1, cell]]});
         this.setState({cells:newCells});
   }
   clearBoard(){
