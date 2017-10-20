@@ -22212,7 +22212,7 @@ var App = function (_React$Component) {
             var generatedCells = this.generateCells();
             return _react2.default.createElement(
                 'div',
-                null,
+                { className: 'mainContainer' },
                 _react2.default.createElement(_Controls2.default, { generations: this.state.generations, pauseGame: this.pauseGame.bind(this), runGame: this.runGame.bind(this), clearBoard: this.clearBoard.bind(this) }),
                 _react2.default.createElement(
                     'div',
